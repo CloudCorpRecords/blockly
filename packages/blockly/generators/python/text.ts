@@ -29,7 +29,7 @@ export function text(
 /**
  * Regular expression to detect a single-quoted string literal.
  */
-const strRegExp = /^\s*'([^']|\\')*'\s*$/;
+const strRegExp = /^\s*'(?:[^'\\]|\\.)*'\s*$/;
 
 /**
  * Enclose the provided value in 'str(...)' function.

@@ -18,7 +18,7 @@ import {Order} from './javascript_generator.js';
 /**
  * Regular expression to detect a single-quoted string literal.
  */
-const strRegExp = /^\s*'([^']|\\')*'\s*$/;
+const strRegExp = /^\s*'(?:[^'\\]|\\.)*'\s*$/;
 
 /**
  * Enclose the provided value in 'String(...)' function.
