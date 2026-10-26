@@ -365,6 +365,37 @@ suite('WorkspaceSearch', function () {
       assertNoExtraCurrentStyling(this.blocks, expectedBlocks[0]);
     });
 
+    test('Match collapsed ancestor of deeply nested block', function () {
+      const outerBlock = this.workspace.newBlock('test_statement_block');
+      const middleBlock = this.workspace.newBlock('test_statement_block');
+      const innerBlock = this.workspace.newBlock('test_text');
+      middleBlock.inputList[0].connection.connect(innerBlock.outputConnection);
+      outerBlock.inputList[1].connection.connect(
+        middleBlock.previousConnection,
+      );
+      outerBlock.setCollapsed(true);
+      const allBlocks = [...this.blocks, outerBlock, middleBlock, innerBlock];
+      this.workspace.getAllBlocks.returns(allBlocks);
+      this.workspaceSearch.searchAndHighlight('string', false);
+      const expectedBlocks = [
+        this.testStatementBlockWithInputCollapsed,
+        this.fieldWithOutputConnected,
+        this.fieldWithOutput,
+        outerBlock,
+      ];
+      assertEqualsSearchGroup(
+        allBlocks,
+        this.workspaceSearch.blocks,
+        expectedBlocks,
+      );
+      assertNoExtraCurrentStyling(allBlocks, expectedBlocks[0]);
+      assert.equal(
+        isBlockHighlighted(innerBlock),
+        false,
+        'Expected block nested in a collapsed block to not be highlighted.',
+      );
+    });
+
     test('Preserve current, in results', function () {
       this.workspaceSearch.searchAndHighlight('test');
       this.workspaceSearch.setCurrentBlock(1);

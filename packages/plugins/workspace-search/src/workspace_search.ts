@@ -618,9 +618,18 @@ export class WorkspaceSearch
   private getSearchPool(workspace: Blockly.WorkspaceSvg): Blockly.BlockSvg[] {
     const blocks = workspace.getAllBlocks(true);
     return blocks.filter((block) => {
-      // Filter out blocks contained inside of another collapsed block.
-      const surroundParent = block.getSurroundParent();
-      return !surroundParent || !surroundParent.isCollapsed();
+      // Filter out blocks contained inside of a collapsed block, at any
+      // depth. The collapsed block itself stays in the pool, and its text
+      // includes the text of the blocks it contains, so a match inside it
+      // is found on the visible collapsed block instead.
+      let surroundParent = block.getSurroundParent();
+      while (surroundParent) {
+        if (surroundParent.isCollapsed()) {
+          return false;
+        }
+        surroundParent = surroundParent.getSurroundParent();
+      }
+      return true;
     });
   }
 
